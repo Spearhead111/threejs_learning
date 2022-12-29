@@ -1,10 +1,15 @@
+<!--
+ * @Author: Spearhead
+ * @Date: 2022-12-29 19:22:51
+ * @LastEditTime: 2022-12-29 22:40:10
+-->
 <template>
   <div>{{ name }}</div>
   <button @click="changeName()">改变name</button>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, onMounted } from 'vue';
+import { defineComponent, reactive, toRefs, onMounted, watch } from 'vue';
 
 export default defineComponent({
   setup(_, ctx) {

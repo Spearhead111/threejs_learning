@@ -1,3 +1,8 @@
+<!--
+ * @Author: Spearhead
+ * @Date: 2022-12-29 22:34:26
+ * @LastEditTime: 2022-12-29 22:44:23
+-->
 <template>
   <p>你好</p>
   <div>{{ name }}</div>
