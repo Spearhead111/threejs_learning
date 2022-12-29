@@ -1,4 +1,5 @@
 <template>
+  <p>你好</p>
   <div>{{ name }}</div>
   <button @click="changeName()">改变name</button>
 </template>
