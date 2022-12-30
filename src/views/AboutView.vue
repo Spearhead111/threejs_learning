@@ -1,5 +1,16 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <div></div>
 </template>
+
+<script lang="ts">
+import { defineComponent, reactive, toRefs } from 'vue';
+
+export default defineComponent({
+  setup() {
+    const dataMap = reactive({});
+    return { ...toRefs(dataMap) };
+  },
+});
+</script>
+
+<style lang="stylus" module></style>

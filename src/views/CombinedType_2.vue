@@ -1,7 +1,7 @@
 <!--
  * @Author: Spearhead
  * @Date: 2022-12-29 22:34:26
- * @LastEditTime: 2022-12-29 22:44:23
+ * @LastEditTime: 2022-12-30 14:46:20
 -->
 <template>
   <p>你好</p>
@@ -29,4 +29,12 @@ onMounted((): void => {
 });
 </script>
 
-<style lang="stylus" module></style>
+<style lang="less" module>
+body {
+  padding: 0px;
+
+  button {
+    padding: 10px;
+  }
+}
+</style>

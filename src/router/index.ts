@@ -25,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'CombinedType_2',
     component: () => import('../views/CombinedType_2.vue'),
   },
+  {
+    path: '/new',
+    name: 'new',
+    component: () => import('../views/NewTest.vue'),
+  },
 ];
 
 const router = createRouter({
