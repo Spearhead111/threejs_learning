@@ -52,9 +52,14 @@ const width = window.innerWidth,
   height = window.innerHeight;
 const camera = new THREE.PerspectiveCamera(45, width / height, 10, 5000);
 //设置相机位置
-camera.position.set(300, 300, 300);
+camera.position.set(300, 0, 0);
 //设置相机方向
 camera.lookAt(0, 0, 0);
+
+// camera.up设置相机以哪个方向为上方向,默认y轴为上方向(帮助我自己理解:设置了controls后鼠标垂直上下移动时候'在上面'的方向)
+// camera.up.x = 0;
+// camera.up.y = 1;
+// camera.up.z = 0;
 
 //创建辅助坐标轴
 const axesHelper = new THREE.AxesHelper(1000); //参数200标示坐标系大小，可以根据场景大小去设置
