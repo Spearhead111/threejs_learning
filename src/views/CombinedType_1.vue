@@ -1,7 +1,7 @@
 <!--
  * @Author: Spearhead
  * @Date: 2022-12-29 19:22:51
- * @LastEditTime: 2022-12-29 22:40:10
+ * @LastEditTime: 2022-12-30 09:59:17
 -->
 <template>
   <div>{{ name }}</div>
@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, onMounted, watch } from 'vue';
+import { defineComponent, reactive, toRefs, onMounted } from 'vue';
 
 export default defineComponent({
   setup(_, ctx) {
