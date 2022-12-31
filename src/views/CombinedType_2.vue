@@ -1,7 +1,7 @@
 <!--
  * @Author: Spearhead
  * @Date: 2022-12-29 22:34:26
- * @LastEditTime: 2022-12-31 18:48:24
+ * @LastEditTime: 2022-12-31 23:36:23
 -->
 <template>
   <p>你好</p>
@@ -29,7 +29,7 @@ onMounted((): void => {
 });
 </script>
 
-<style lang="less" module>
+<style lang="less" scoped>
 body {
   padding: 0px;
 

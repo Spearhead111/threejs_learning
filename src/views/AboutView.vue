@@ -13,4 +13,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="stylus" module></style>
+<style lang="stylus" scoped></style>

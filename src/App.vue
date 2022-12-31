@@ -2,7 +2,7 @@
   <nav>
     <router-link to="/">Home11122</router-link> | <router-link to="/about">About</router-link> |
     <router-link to="/CombinedType_1">CombinedType_1</router-link> | <router-link to="/CombinedType_2">CombinedType_2</router-link> |
-    <router-link to="/new">new</router-link> |
+    <!-- <router-link to="/new">new</router-link> | -->
     <router-link to="/Test3D">Test3D</router-link>
   </nav>
   <router-view />
@@ -15,5 +15,5 @@
   -moz-osx-font-smoothing grayscale
   text-align center
   color #2c3e50
-  margin-top 60px
+  // margin-top 60px
 </style>
