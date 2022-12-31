@@ -52,7 +52,7 @@ const width = window.innerWidth,
   height = window.innerHeight;
 const camera = new THREE.PerspectiveCamera(45, width / height, 10, 5000);
 //设置相机位置
-camera.position.set(300, 0, 0);
+camera.position.set(300, 300, 300);
 //设置相机方向
 camera.lookAt(0, 0, 0);
 

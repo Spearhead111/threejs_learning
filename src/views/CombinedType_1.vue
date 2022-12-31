@@ -1,7 +1,7 @@
 <!--
  * @Author: Spearhead
  * @Date: 2022-12-29 19:22:51
- * @LastEditTime: 2022-12-30 13:55:55
+ * @LastEditTime: 2022-12-31 18:51:30
 -->
 <template>
   <div>{{ name }}</div>
