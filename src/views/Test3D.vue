@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-01 16:23:59
+ * @LastEditTime: 2023-01-01 19:07:53
 -->
 <template>
   <button @click="addScene">添加</button>
@@ -11,6 +11,7 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -18,7 +19,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
-import { onBeforeUnmount } from 'vue';
+import Stats from 'stats.js';
 
 let scene: any; // 三维场景
 let camera: any; // 透视相机
@@ -33,6 +34,7 @@ let width = 1000,
   height = 500;
 let raycaster: any;
 let doAnimation = false; // 是否进行animate
+let stats: any;
 
 // 初始化scene
 const initScene = () => {
@@ -93,6 +95,20 @@ const initScene = () => {
   controls.addEventListener('change', () => {
     renderer.render(scene, camera); //监听鼠标，键盘事件
   });
+  appendRenderDomElement();
+};
+
+// 初始化stats性能控件
+const initStats = () => {
+  stats = new Stats();
+  //设置统计模式
+  stats.setMode(0); // 0: fps, 1: ms
+  //统计信息显示在左上角
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.left = '0px';
+  stats.domElement.style.top = '0px';
+  //将统计对象添加到对应的<div>元素中
+  stats.domElement && document.getElementById('my-three')?.appendChild(stats.domElement);
 };
 
 // 添加renderer的domElement
@@ -141,11 +157,11 @@ const outlineObj = (selectedObjects: any): void => {
   // 物体边缘发光通道
   outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera, selectedObjects);
   outlinePass.selectedObjects = selectedObjects;
-  outlinePass.edgeStrength = 8.0; // 边框的亮度
+  outlinePass.edgeStrength = 4.0; // 边框的亮度
   outlinePass.edgeGlow = 2; // 光晕[0,1]
   outlinePass.usePatternTexture = false; // 是否使用父级的材质
-  outlinePass.edgeThickness = 0.5; // 边框宽度
-  outlinePass.downSampleRatio = 1; // 边框弯曲度
+  outlinePass.edgeThickness = 1; // 边框宽度
+  outlinePass.downSampleRatio = 2; // 边框弯曲度
   outlinePass.pulsePeriod = 10; // 呼吸闪烁的速度
   outlinePass.visibleEdgeColor.set(new THREE.Color(255, 255, 255)); // 呼吸显示的颜色
   outlinePass.hiddenEdgeColor = new THREE.Color(0, 0, 0); // 呼吸消失的颜色
@@ -164,9 +180,8 @@ let animate = () => {
     requestAnimationFrame(animate);
     //渲染外发光
     renderer.render(scene, camera);
-    if (composer) {
-      composer.render();
-    }
+    stats && stats.update();
+    composer && composer.render();
   }
 };
 
@@ -176,8 +191,8 @@ const addScene = () => {
     doAnimation = true;
     // 初始化scene
     initScene();
-    // 添加renderer的domElement
-    appendRenderDomElement();
+    // 初始化status
+    initStats();
     // 添加点击事件
     addClickEvent();
 
@@ -212,7 +227,8 @@ const releaseRender = (renderer: any, scene: any) => {
     return;
   }
 
-  document.getElementById('my-three')?.removeChild(renderer.domElement);
+  renderer.domElement && document.getElementById('my-three')?.removeChild(renderer.domElement);
+  stats?.domElement && document.getElementById('my-three')?.removeChild(stats.domElement);
   let clearScene = function (scene: any) {
     let arr = scene.children.filter((x: any) => x);
     arr.forEach((item: any) => {
@@ -256,4 +272,8 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+#my-three {
+  position: relative;
+}
+</style>
