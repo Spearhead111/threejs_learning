@@ -2,16 +2,19 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-01 19:07:53
+ * @LastEditTime: 2023-01-02 00:08:10
 -->
 <template>
-  <button @click="addScene">添加</button>
-  <button @click="removeScene()">清除</button>
+  <div class="control">
+    <button @click="addScene">添加</button>
+    <button @click="removeScene">清除</button>
+    <button @click="updateScene">刷新</button>
+  </div>
   <div id="my-three"></div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -30,11 +33,16 @@ let light: any; // 点光源
 let renderer: any; // WebGL渲染器
 let controls: any; // 轨道控制器
 let axesHelper: any; // 辅助坐标轴
-let width = 1000,
-  height = 500;
+// let width = 1000,
+//   height = 500;
+let width = window.innerWidth,
+  height = window.innerHeight;
 let raycaster: any;
 let doAnimation = false; // 是否进行animate
 let stats: any;
+let renderPass: any; // 场景通道
+let outlinePass: any; // 物体边缘发光通道
+let composer: any; // EffectComposer（效果组合器）对象
 
 // 初始化scene
 const initScene = () => {
@@ -87,7 +95,10 @@ const initScene = () => {
   axesHelper = new THREE.AxesHelper(1000); //参数200标示坐标系大小，可以根据场景大小去设置
   scene.add(axesHelper);
   //创建一个WebGL渲染器
-  renderer = new THREE.WebGLRenderer();
+  // renderer = new THREE.WebGLRenderer();
+  // 设置渲染器的透明度实现背景
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearAlpha(0.2); // 设置alpha的值，范围在0 - 1.0之间
   renderer.setSize(width, height); //设置渲染区尺寸
   renderer.render(scene, camera); //执行渲染操作、指定场景、相机作为参数
   //创建控件对象
@@ -125,6 +136,23 @@ const removeClickEvent = () => {
   document.getElementById('my-three')?.removeEventListener('click', clickEvent);
 };
 
+// 添加window的resize事件
+const addWindowResizeEvent = () => {
+  window.addEventListener('resize', onWindowResize);
+};
+
+// 移除window的resize事件
+const removeWindowResizeEvent = () => {
+  window.removeEventListener('resize', onWindowResize);
+};
+
+//  页面大小改变回调
+const onWindowResize = () => {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  renderer && renderer.setSize(width, height);
+};
+
 // 点击事件
 const clickEvent = () => {
   const event: any = window.event;
@@ -143,10 +171,6 @@ const clickEvent = () => {
   }
 };
 
-let renderPass: any;
-let outlinePass: any;
-let composer: any;
-
 //高亮显示模型（呼吸灯）
 const outlineObj = (selectedObjects: any): void => {
   // 创建一个EffectComposer（效果组合器）对象，然后在该对象上添加后期处理通道。
@@ -157,13 +181,13 @@ const outlineObj = (selectedObjects: any): void => {
   // 物体边缘发光通道
   outlinePass = new OutlinePass(new THREE.Vector2(width, height), scene, camera, selectedObjects);
   outlinePass.selectedObjects = selectedObjects;
-  outlinePass.edgeStrength = 4.0; // 边框的亮度
-  outlinePass.edgeGlow = 2; // 光晕[0,1]
+  outlinePass.edgeStrength = 8.0; // 边框的亮度，最大10
+  outlinePass.edgeGlow = 0.8; // 光晕[0,1]//,最大1
   outlinePass.usePatternTexture = false; // 是否使用父级的材质
-  outlinePass.edgeThickness = 1; // 边框宽度
-  outlinePass.downSampleRatio = 2; // 边框弯曲度
-  outlinePass.pulsePeriod = 10; // 呼吸闪烁的速度
-  outlinePass.visibleEdgeColor.set(new THREE.Color(255, 255, 255)); // 呼吸显示的颜色
+  outlinePass.edgeThickness = 2; // 边框宽度,最大4
+  outlinePass.downSampleRatio = 1; // 边框弯曲度
+  outlinePass.pulsePeriod = 1; // 呼吸闪烁的速度
+  outlinePass.visibleEdgeColor.set(new THREE.Color(0, 0, 255)); // 呼吸显示的颜色
   outlinePass.hiddenEdgeColor = new THREE.Color(0, 0, 0); // 呼吸消失的颜色
   outlinePass.clear = true;
   composer.addPass(outlinePass);
@@ -195,14 +219,22 @@ const addScene = () => {
     initStats();
     // 添加点击事件
     addClickEvent();
-
+    // 添加window的resize函数
+    addWindowResizeEvent();
     animate();
   }
 };
 
-// 清除场景
+// 更新场景
+const updateScene = () => {
+  removeScene();
+  addScene();
+};
+
+// 移除场景
 const removeScene = () => {
   removeClickEvent();
+  removeWindowResizeEvent();
   // 停止animate渲染
   doAnimation = false;
   releaseRender(renderer, scene);
@@ -266,6 +298,10 @@ const releaseRender = (renderer: any, scene: any) => {
   THREE.Cache.clear();
 };
 
+onMounted(() => {
+  console.log(width, height);
+});
+
 onBeforeUnmount(() => {
   console.log('准备组件卸载前清除缓存和节点');
   removeScene();
@@ -273,7 +309,20 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="less" scoped>
+.control {
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  top: 10px;
+  button {
+    margin-left: 10px;
+  }
+}
+
 #my-three {
   position: relative;
+  overflow: hidden;
+  background: url('../assets/star2.jpeg');
+  background-size: cover;
 }
 </style>
