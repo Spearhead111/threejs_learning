@@ -3,6 +3,11 @@ import HomeView from '../views/HomeView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/NewTest',
+    name: 'NewTest',
+    component: () => import('../views/NewTest.vue'),
+  },
+  {
     path: '/CombinedType_1',
     name: 'CombinedType_1',
     component: () => import('../views/CombinedType_1.vue'),
@@ -16,6 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/Test3D',
     name: 'Test3D',
     component: () => import('../views/Test3D.vue'),
+    meta: { fullScreen: true },
   },
 ];
 
