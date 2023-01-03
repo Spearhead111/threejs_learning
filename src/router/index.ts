@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/Test3D',
     name: 'Test3D',
     component: () => import('../views/Test3D.vue'),
-    meta: { fullScreen: true },
+    meta: { fullscreen: true },
   },
 ];
 
