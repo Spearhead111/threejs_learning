@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "dat.gui": "^0.7.9",
     "gsap": "^3.11.4",
     "less-loader": "^11.1.0",
     "sass-loader": "^13.2.0",
@@ -21,6 +22,7 @@
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.7",
     "@types/stats.js": "^0.17.0",
     "@types/three": "^0.147.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
