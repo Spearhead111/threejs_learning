@@ -1,5 +1,5 @@
 <template>
-  <nav v-if="!$route.meta.fullScreen">
+  <nav v-if="isShow">
     <router-link to="/CombinedType_1">CombinedType_1</router-link> | <router-link to="/CombinedType_2">CombinedType_2</router-link> |
     <router-link to="/Test3D">Test3D</router-link>
   </nav>
@@ -7,12 +7,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+let isShow = ref(false);
 const $route = useRoute();
-onMounted(() => {
-  console.log($route.meta.fullScreen);
+
+// 根据路由元信息的fullscreen来判断是否显示上方导航栏
+watch($route, () => {
+  isShow.value = $route.meta.fullscreen === true ? false : true;
 });
 </script>
 
