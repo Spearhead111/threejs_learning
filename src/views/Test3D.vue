@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-02 00:51:46
+ * @LastEditTime: 2023-01-02 23:40:11
 -->
 <template>
   <div class="control">
@@ -22,6 +22,7 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import Stats from 'stats.js';
+import gsap from 'gsap';
 
 let scene: any; // 三维场景
 let camera: any; // 透视相机
@@ -40,11 +41,25 @@ let stats: any; // 性能控件
 let renderPass: any; // 场景通道
 let outlinePass: any; // 物体边缘发光通道
 let composer: any; // EffectComposer（效果组合器）对象
+const clock = new THREE.Clock();
 
 // 初始化scene
 const initScene = () => {
   //创建一个三维场景
   scene = new THREE.Scene();
+  //创建一个透视相机
+  camera = new THREE.PerspectiveCamera(45, width / height, 10, 5000);
+  //设置相机位置
+  camera.position.set(300, 300, 300);
+  //设置相机方向
+  camera.lookAt(0, 0, 0);
+  // camera.up设置相机以哪个方向为上方向,默认y轴为上方向(帮助我自己理解:设置了controls后鼠标垂直上下移动时候'在上面'的方向)
+  // camera.up.x = 0;
+  // camera.up.y = 1;
+  // camera.up.z = 0;
+  //创建辅助坐标轴
+  axesHelper = new THREE.AxesHelper(1000); //参数200标示坐标系大小，可以根据场景大小去设置
+  scene.add(axesHelper);
   //创建一个物体（形状）
   const geometry = new THREE.BoxGeometry(100, 100, 100); //长宽高都是100的立方体
   // const geometry = new THREE.SphereGeometry(60,40,40);//半径是60的圆
@@ -74,19 +89,6 @@ const initScene = () => {
   light.position.set(120, 0, 400); // 设置点光源位置
   scene.add(ambient);
   scene.add(light);
-  //创建一个透视相机
-  camera = new THREE.PerspectiveCamera(45, width / height, 10, 5000);
-  //设置相机位置
-  camera.position.set(300, 300, 300);
-  //设置相机方向
-  camera.lookAt(0, 0, 0);
-  // camera.up设置相机以哪个方向为上方向,默认y轴为上方向(帮助我自己理解:设置了controls后鼠标垂直上下移动时候'在上面'的方向)
-  // camera.up.x = 0;
-  // camera.up.y = 1;
-  // camera.up.z = 0;
-  //创建辅助坐标轴
-  axesHelper = new THREE.AxesHelper(1000); //参数200标示坐标系大小，可以根据场景大小去设置
-  scene.add(axesHelper);
   // 创建一个WebGL渲染器
   // renderer = new THREE.WebGLRenderer();
   // 设置渲染器的透明度实现背景
@@ -202,6 +204,11 @@ const outlineObj = (selectedObjects: any): void => {
 let animate = () => {
   if (doAnimation) {
     requestAnimationFrame(animate);
+    // // 获取时间间隔
+    // const deltaTime = clock.getDelta();
+    // // 设置移动
+    // mesh.position.x += deltaTime * 20;
+
     //渲染外发光
     renderer.render(scene, camera);
     stats && stats.update();
@@ -221,6 +228,31 @@ const addScene = () => {
     addClickEvent();
     // 添加window的resize函数
     addWindowResizeEvent();
+    // 利用gsap来设置mesh1的移动
+    const meshAnimateX = gsap.to(mesh.position, {
+      x: 400,
+      // y: 200,
+      duration: 4,
+      ease: 'power1.inOut',
+      // 重复次数,-1表示无限循环
+      repeat: -1,
+      // 往返运动
+      yoyo: true,
+      // 延时运动
+      delay: 0,
+      onStart: () => {
+        console.log('动画开始');
+      },
+      onComplete: () => {
+        console.log('动画结束');
+      },
+    });
+    // 添加双击暂停时间
+    document.getElementById('my-three')?.addEventListener('dblclick', () => {
+      meshAnimateX.isActive() ? meshAnimateX.pause() : meshAnimateX.resume();
+    });
+
+    // gsap.to(mesh.rotation, { x: Math.PI, duration: 2 });
     animate();
   }
 };
