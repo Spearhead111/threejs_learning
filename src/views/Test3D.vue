@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-02 23:40:11
+ * @LastEditTime: 2023-01-03 14:49:36
 -->
 <template>
   <div class="control">
@@ -23,14 +23,15 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import Stats from 'stats.js';
 import gsap from 'gsap';
+import * as dat from 'dat.gui';
 
 let scene: any; // 三维场景
 let camera: any; // 透视相机
-let mesh: any; // 网格模型对象
-let mesh2: any;
+let mesh: THREE.Mesh; // 网格模型对象
+let mesh2: THREE.Mesh;
 let ambient: any; // 环境光源
 let light: any; // 点光源
-let renderer: any; // WebGL渲染器
+let renderer: THREE.WebGLRenderer; // WebGL渲染器
 let controls: any; // 轨道控制器
 let axesHelper: any; // 辅助坐标轴
 let width = window.innerWidth,
@@ -42,6 +43,7 @@ let renderPass: any; // 场景通道
 let outlinePass: any; // 物体边缘发光通道
 let composer: any; // EffectComposer（效果组合器）对象
 const clock = new THREE.Clock();
+let gui: dat.GUI;
 
 // 初始化scene
 const initScene = () => {
@@ -98,6 +100,8 @@ const initScene = () => {
   renderer.render(scene, camera); //执行渲染操作、指定场景、相机作为参数
   //创建控件对象
   controls = new OrbitControls(camera, renderer.domElement);
+  // 设置控制器阻尼,让控制器更有真实效果
+  controls.enableDamping = true;
   controls.addEventListener('change', () => {
     renderer.render(scene, camera); //监听鼠标，键盘事件
   });
@@ -141,19 +145,32 @@ const removeWindowResizeEvent = () => {
   window.removeEventListener('resize', onWindowResize);
 };
 
+// 添加双击进入/取消全屏
+const addFullScreenEvent = () => {
+  window.addEventListener('dblclick', () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      renderer.domElement?.requestFullscreen();
+    }
+  });
+};
 //  页面大小改变回调,根据页面的大小更新更新渲染
 const onWindowResize = () => {
   width = window.innerWidth;
   height = window.innerHeight;
-  // 更新渲染区域大小
+  // 更新相机
+  camera.aspect = width / height;
+  // 更新相机的投影矩阵
+  camera.updateProjectionMatrix();
+  // 更新渲染器尺寸大小
   renderer.setSize(width, height);
+  // 设置渲染器像素比
+  renderer.setPixelRatio(window.devicePixelRatio);
   // // css2d渲染器更新
   // scene.cssRender.setSize(width, height);
   // // css3d渲染器更新
   // scene.css3DRender.setSize(width, height);
-  // 更新相机
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
 };
 
 // 点击事件
@@ -203,16 +220,16 @@ const outlineObj = (selectedObjects: any): void => {
 //渲染场景
 let animate = () => {
   if (doAnimation) {
-    requestAnimationFrame(animate);
     // // 获取时间间隔
     // const deltaTime = clock.getDelta();
     // // 设置移动
     // mesh.position.x += deltaTime * 20;
 
-    //渲染外发光
     renderer.render(scene, camera);
+    controls && controls.update();
     stats && stats.update();
     composer && composer.render();
+    requestAnimationFrame(animate);
   }
 };
 
@@ -228,31 +245,47 @@ const addScene = () => {
     addClickEvent();
     // 添加window的resize函数
     addWindowResizeEvent();
-    // 利用gsap来设置mesh1的移动
-    const meshAnimateX = gsap.to(mesh.position, {
-      x: 400,
-      // y: 200,
-      duration: 4,
-      ease: 'power1.inOut',
-      // 重复次数,-1表示无限循环
-      repeat: -1,
-      // 往返运动
-      yoyo: true,
-      // 延时运动
-      delay: 0,
-      onStart: () => {
-        console.log('动画开始');
-      },
-      onComplete: () => {
-        console.log('动画结束');
-      },
-    });
-    // 添加双击暂停时间
-    document.getElementById('my-three')?.addEventListener('dblclick', () => {
-      meshAnimateX.isActive() ? meshAnimateX.pause() : meshAnimateX.resume();
-    });
+    // // 添加双击全屏事件
+    // addFullScreenEvent();
+    // // 利用gsap来设置mesh1的移动
+    // const meshAnimateX = gsap.to(mesh.position, {
+    //   x: 400,
+    //   // y: 200,
+    //   duration: 4,
+    //   ease: 'power1.inOut',
+    //   // 重复次数,-1表示无限循环
+    //   repeat: -1,
+    //   // 往返运动
+    //   yoyo: true,
+    //   // 延时运动
+    //   delay: 0,
+    //   onStart: () => {
+    //     console.log('动画开始');
+    //   },
+    //   onComplete: () => {
+    //     console.log('动画结束');
+    //   },
+    // });
+    // // 添加双击暂停时间
+    // document.getElementById('my-three')?.addEventListener('dblclick', () => {
+    //   meshAnimateX.isActive() ? meshAnimateX.pause() : meshAnimateX.resume();
+    // });
+    // // gsap.to(mesh.rotation, { x: Math.PI, duration: 2 });
+    // 添加dat的gui控件
+    gui = new dat.GUI();
+    gui
+      .add(mesh2.position, 'x')
+      .min(120)
+      .max(300)
+      .step(1)
+      .name('mesh2的x')
+      .onChange(() => {
+        console.log(mesh2.position);
+      });
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.right = '200px';
 
-    // gsap.to(mesh.rotation, { x: Math.PI, duration: 2 });
     animate();
   }
 };
@@ -265,8 +298,10 @@ const removeScene = () => {
   doAnimation = false;
   releaseRender(renderer, scene);
   composer = null;
-  renderer = null;
+  // renderer = null;
   scene = null;
+  // 移除dat的gui控件
+  gui && gui.domElement?.parentNode && gui.destroy();
 };
 
 // 清除render
