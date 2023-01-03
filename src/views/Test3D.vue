@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-03 14:49:36
+ * @LastEditTime: 2023-01-03 17:55:37
 -->
 <template>
   <div class="control">
@@ -248,7 +248,7 @@ const addScene = () => {
     // // 添加双击全屏事件
     // addFullScreenEvent();
     // // 利用gsap来设置mesh1的移动
-    // const meshAnimateX = gsap.to(mesh.position, {
+    // const meshAnimateX = gsap.to(mesh.position, {{}
     //   x: 400,
     //   // y: 200,
     //   duration: 4,
@@ -273,6 +273,9 @@ const addScene = () => {
     // // gsap.to(mesh.rotation, { x: Math.PI, duration: 2 });
     // 添加dat的gui控件
     gui = new dat.GUI();
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.top = '0';
+    gui.domElement.style.right = '200px';
     gui
       .add(mesh2.position, 'x')
       .min(120)
@@ -281,10 +284,28 @@ const addScene = () => {
       .name('mesh2的x')
       .onChange(() => {
         console.log(mesh2.position);
+      })
+      .onFinishChange(() => {
+        console.log('完成修改');
       });
-    gui.domElement.style.position = 'absolute';
-    gui.domElement.style.top = '0';
-    gui.domElement.style.right = '200px';
+    // 修改物体颜色
+    const params = {
+      color: '#ffff00',
+      fn: () => {
+        gsap.to(mesh2.position, { y: 100, duration: 2, yoyo: true, repeat: -1 });
+      },
+    };
+    gui.addColor(params, 'color').onChange((value) => {
+      //   @ts-ignore
+      mesh2.material.color.set(value);
+    });
+    gui.add(mesh2, 'visible').name('是否显示');
+    // 点击触发某个事件
+    gui.add(params, 'fn').name('球运动');
+    //
+    const folder = gui.addFolder('设置立方体');
+    folder.add(mesh2.material, 'wireframe').name('mesh2的网格展示');
+    folder.add(mesh.material, 'wireframe').name('mesh的网格展示');
 
     animate();
   }
