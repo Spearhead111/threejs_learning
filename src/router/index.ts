@@ -22,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Test3D.vue'),
     meta: { fullscreen: true },
   },
+  {
+    path: '/TestA1',
+    name: 'TestA1',
+    component: () => import('../views/TestA1.vue'),
+    meta: { fullscreen: true },
+  },
 ];
 
 const router = createRouter({

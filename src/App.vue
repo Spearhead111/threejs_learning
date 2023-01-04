@@ -1,7 +1,7 @@
 <template>
   <nav v-if="isShow">
     <router-link to="/CombinedType_1">CombinedType_1</router-link> | <router-link to="/CombinedType_2">CombinedType_2</router-link> |
-    <router-link to="/Test3D">Test3D</router-link>
+    <router-link to="/Test3D">Test3D</router-link> | <router-link to="/TestA1">TestA1</router-link>
   </nav>
   <router-view />
 </template>
