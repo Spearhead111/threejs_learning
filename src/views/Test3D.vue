@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-03 17:55:37
+ * @LastEditTime: 2023-01-04 15:56:26
 -->
 <template>
   <div class="control">
@@ -67,11 +67,14 @@ const initScene = () => {
   // const geometry = new THREE.SphereGeometry(60,40,40);//半径是60的圆
   //widthSegments, heightSegments：水平方向和垂直方向上分段数。widthSegments最小值为3，默认值为8。heightSegments最小值为2，默认值为6。
   //创建材质（外观）
-  const material = new THREE.MeshLambertMaterial({
+  // MeshPhongMaterial 镜面反射
+  // MeshLambertMaterial 漫反射
+  const material = new THREE.MeshPhongMaterial({
     color: 0x0000ff, //设置材质颜色(蓝色)
+    specular: 0xffff00,
     // color: 0x00ff00, //(绿色)
-    transparent: true, //开启透明度
-    opacity: 0.5, //设置透明度
+    // transparent: true, //开启透明度
+    // opacity: 0.5, //设置透明度
   });
   //创建一个网格模型对象
   mesh = new THREE.Mesh(geometry, material); //网络模型对象Mesh
@@ -85,9 +88,24 @@ const initScene = () => {
   mesh2 = new THREE.Mesh(geometry2, material2); //网格模型对象Mesh
   mesh2.position.set(120, 0, 0); //设置mesh3模型对象的xyz坐标为120,0,0
   scene.add(mesh2);
+
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-100, 0, 0),
+    new THREE.Vector3(0, 100, 0),
+    new THREE.Vector3(0, 0, 100),
+  ]);
+  const material3 = new THREE.LineDashedMaterial({
+    color: 0x0000ff,
+    linewidth: 1,
+    scale: 1,
+    dashSize: 10,
+    gapSize: 5,
+  });
+  const line = new THREE.Line(lineGeometry, material3);
+  scene.add(line);
   //添加光源 //会照亮场景里的全部物体（氛围灯），前提是物体是可以接受灯光的，这种灯是无方向的，即不会有阴影。
-  ambient = new THREE.AmbientLight(0xffffff, 0.4);
-  light = new THREE.PointLight(0xffffff, 1); //点光源，color:灯光颜色，intensity:光照强度
+  ambient = new THREE.AmbientLight(0x444444, 0.4);
+  light = new THREE.PointLight(0xffffff, 0.8); //点光源，color:灯光颜色，intensity:光照强度
   light.position.set(120, 0, 400); // 设置点光源位置
   scene.add(ambient);
   scene.add(light);
@@ -389,7 +407,7 @@ onBeforeUnmount(() => {
 #my-three {
   position: relative;
   overflow: hidden;
-  background: url('../assets/star2.jpeg');
-  background-size: cover;
+  // background: url('../assets/star2.jpeg');
+  // background-size: cover;
 }
 </style>
