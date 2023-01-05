@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2022-12-31 21:42:12
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-04 15:56:26
+ * @LastEditTime: 2023-01-05 11:02:56
 -->
 <template>
   <div class="control">
@@ -31,6 +31,7 @@ let mesh: THREE.Mesh; // 网格模型对象
 let mesh2: THREE.Mesh;
 let ambient: any; // 环境光源
 let light: any; // 点光源
+let directionalLight: any; // 平行光源
 let renderer: THREE.WebGLRenderer; // WebGL渲染器
 let controls: any; // 轨道控制器
 let axesHelper: any; // 辅助坐标轴
@@ -79,15 +80,17 @@ const initScene = () => {
   //创建一个网格模型对象
   mesh = new THREE.Mesh(geometry, material); //网络模型对象Mesh
   //把网格模型添加到三维场景
+  mesh.castShadow = mesh.receiveShadow = true;
   scene.add(mesh); //网络模型添加到场景中
   // 添加多个模型（添加圆形）
   const geometry2 = new THREE.SphereGeometry(60, 40, 40);
-  const material2 = new THREE.MeshLambertMaterial({
+  const material2 = new THREE.MeshStandardMaterial({
     color: 0xffff00,
   });
   mesh2 = new THREE.Mesh(geometry2, material2); //网格模型对象Mesh
   mesh2.position.set(120, 0, 0); //设置mesh3模型对象的xyz坐标为120,0,0
   scene.add(mesh2);
+  mesh2.castShadow = mesh2.receiveShadow = true;
 
   const lineGeometry = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(-100, 0, 0),
@@ -103,20 +106,72 @@ const initScene = () => {
   });
   const line = new THREE.Line(lineGeometry, material3);
   scene.add(line);
+
+  //创建一个平面几何体作为投影面
+  var planeGeometry = new THREE.PlaneGeometry(500, 500);
+  var planeMaterial = new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+  });
+  // 平面网格模型作为投影面
+  var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+  scene.add(planeMesh); //网格模型添加到场景中
+  planeMesh.rotateX(-Math.PI / 2); //旋转网格模型
+  planeMesh.position.y = -60; //设置网格模型y坐标
+  // 设置接收阴影的投影面
+  planeMesh.receiveShadow = true;
+
   //添加光源 //会照亮场景里的全部物体（氛围灯），前提是物体是可以接受灯光的，这种灯是无方向的，即不会有阴影。
   ambient = new THREE.AmbientLight(0x444444, 0.4);
-  light = new THREE.PointLight(0xffffff, 0.8); //点光源，color:灯光颜色，intensity:光照强度
-  light.position.set(120, 0, 400); // 设置点光源位置
+  light = new THREE.PointLight(0xffffff, 1); //点光源，color:灯光颜色，intensity:光照强度
+  light.position.set(300, 300, 300); // 设置点光源位置
+  light.castShadow = true;
+  light.shadow.camera.near = 1;
+  light.shadow.camera.far = 300;
+  const pointLightHelper = new THREE.PointLightHelper(light, 10);
+  // 平行光
+  directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  // 设置光源的方向：通过光源position属性和目标指向对象的position属性计算
+  directionalLight.position.set(300, 300, 300);
+  // 方向光指向对象网格模型mesh2，可以不设置，默认的位置是0,0,0
+  directionalLight.target = mesh;
+  // 设置用于计算阴影的光源对象
+  // directionalLight.castShadow = true;
+  // 设置计算阴影的区域，最好刚好紧密包围在对象周围
+  // 计算阴影的区域过大：模糊  过小：看不到或显示不完整
+  directionalLight.shadow.camera.near = 0.5;
+  directionalLight.shadow.camera.far = 300;
+  directionalLight.shadow.camera.left = -50;
+  directionalLight.shadow.camera.right = 50;
+  directionalLight.shadow.camera.top = 200;
+  directionalLight.shadow.camera.bottom = -100;
+  // 设置mapSize属性可以使阴影更清晰，不那么模糊
+  // directionalLight.shadow.mapSize.set(1024,1024)
+  // 聚光光源
+  const spotLight = new THREE.SpotLight(0xffffff);
+  // 设置聚光光源位置
+  spotLight.position.set(100, 100, 400);
+  // 此属性设置为 true 聚光灯将投射阴影。
+  spotLight.castShadow = true;
+  spotLight.shadow.camera.near = 40;
+  spotLight.shadow.camera.far = 130;
+  // 聚光灯光源指向网格模型mesh2
+  spotLight.target = mesh;
+  // 设置聚光光源发散角度
+  spotLight.angle = Math.PI / 6;
+  scene.add(spotLight); //光对象添加到scene场景中
+  scene.add(directionalLight);
   scene.add(ambient);
-  scene.add(light);
+  // scene.add(light);
+  // scene.add(pointLightHelper);
   // 创建一个WebGL渲染器
   // renderer = new THREE.WebGLRenderer();
   // 设置渲染器的透明度实现背景
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.shadowMap.enabled = true;
   renderer.setClearAlpha(0.2); // 设置alpha的值，范围在0 - 1.0之间
   renderer.setSize(width, height); //设置渲染区尺寸
   renderer.render(scene, camera); //执行渲染操作、指定场景、相机作为参数
-  //创建控件对象
+  // 创建控件对象
   controls = new OrbitControls(camera, renderer.domElement);
   // 设置控制器阻尼,让控制器更有真实效果
   controls.enableDamping = true;
@@ -318,6 +373,7 @@ const addScene = () => {
       mesh2.material.color.set(value);
     });
     gui.add(mesh2, 'visible').name('是否显示');
+    gui.add(directionalLight, 'castShadow').name('平行光的投影');
     // 点击触发某个事件
     gui.add(params, 'fn').name('球运动');
     //

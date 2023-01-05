@@ -28,6 +28,18 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/TestA1.vue'),
     meta: { fullscreen: true },
   },
+  {
+    path: '/ShowShadow',
+    name: 'ShowShadow',
+    component: () => import('../views/_ShowShadow.vue'),
+    meta: { fullscreen: true },
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/_LatheGeometry.vue'),
+    meta: { fullscreen: true },
+  },
 ];
 
 const router = createRouter({
