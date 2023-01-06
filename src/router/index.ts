@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/test',
     name: 'test',
-    component: () => import('../views/_LatheGeometry.vue'),
+    component: () => import('../views/_SpriteRainfall.vue'),
     meta: { fullscreen: true },
   },
 ];
