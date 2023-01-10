@@ -2,7 +2,7 @@
  * @Author: Spearhead
  * @Date: 2023-01-10 11:38:49
  * @LastEditors: Spearhead
- * @LastEditTime: 2023-01-10 14:17:37
+ * @LastEditTime: 2023-01-10 14:32:13
 -->
 <template>
   <div id="my-three"></div>
@@ -47,7 +47,7 @@ const audio = new THREE.Audio(listener);
 // 创建一个音频加载器对象
 const audioLoader = new THREE.AudioLoader();
 // 加载音频文件，返回一个音频缓冲区对象作为回调函数参数
-audioLoader.load('周杰伦-借口.flac', function (AudioBuffer) {
+audioLoader.load('周杰伦-借口.mp3', function (AudioBuffer) {
   // console.log(AudioBuffer)
   // 音频缓冲区对象关联到音频对象audio
   audio.setBuffer(AudioBuffer);
@@ -79,7 +79,7 @@ audioMesh.add(PosAudio);
 // 创建一个音频加载器
 const audioLoader = new THREE.AudioLoader();
 // 加载音频文件，返回一个音频缓冲区对象作为回调函数参数
-audioLoader.load('周杰伦-借口.flac', function (AudioBuffer) {
+audioLoader.load('周杰伦-借口.mp3', function (AudioBuffer) {
   console.log(AudioBuffer);
   // 音频缓冲区对象关联到音频对象audio
   PosAudio.setBuffer(AudioBuffer);
