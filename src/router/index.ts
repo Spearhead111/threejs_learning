@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/test',
     name: 'test',
-    component: () => import('../views/_SkinnedMesh.vue'),
+    component: () => import('../views/_LoadModel_GLTF_Excavator.vue'),
     meta: { fullscreen: true },
   },
 ];
